@@ -42,10 +42,7 @@ pub mod find_process {
             .iter()
             .find(|p| p.remote.as_ref().unwrap().port == port)
     }
-    pub fn by_name(
-        processes: &Vec<sockets::PortInfo>,
-        name: String,
-    ) -> Option<&sockets::PortInfo> {
+    pub fn by_name(processes: &Vec<sockets::PortInfo>, name: String) -> Option<&sockets::PortInfo> {
         let target: String = if name.as_str().ends_with(".exe") {
             name.to_string()
         } else {
@@ -56,10 +53,7 @@ pub mod find_process {
     pub fn by_pid(processes: &Vec<sockets::PortInfo>, pid: u32) -> Option<&sockets::PortInfo> {
         processes.iter().find(|p| p.pid == pid)
     }
-    pub fn by_path(
-        processes: &Vec<sockets::PortInfo>,
-        path: String,
-    ) -> Option<&sockets::PortInfo> {
+    pub fn by_path(processes: &Vec<sockets::PortInfo>, path: String) -> Option<&sockets::PortInfo> {
         let pid = super::process_converter::path_to_pid(path);
         match pid {
             Some(_p) => by_pid(processes, pid.unwrap()),

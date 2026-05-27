@@ -2,7 +2,7 @@ use clap::{Parser, Subcommand};
 
 #[derive(Parser, Debug)]
 #[command(
-    name = "portpeek",
+    name = "bindwatch",
     about = "View network information about processes",
     version = "0.1.0"
 )]
@@ -11,7 +11,7 @@ pub struct Args {
     pub command: Commands,
 }
 
-#[derive(Subcommand, Debug)]
+#[derive(Subcommand, Debug, PartialEq)]
 pub enum Commands {
     List {
         #[arg(long)]
@@ -43,11 +43,11 @@ pub enum Commands {
         remote: bool,
     },
 }
-fn validate_port (s: &str) -> Result<u16, String> {
+fn validate_port(s: &str) -> Result<u16, String> {
     let port = s.parse::<u16>();
-    
+
     if port == Ok(0) {
-        return Err(String::from("Port number must be a nonzero value."))
+        return Err(String::from("Port number must be a nonzero value."));
     } else {
         match port {
             Ok(p) => Ok(p),
@@ -55,7 +55,7 @@ fn validate_port (s: &str) -> Result<u16, String> {
         }
     }
 }
-fn validate_pid (s: &str) -> Result<u32, String> {
+fn validate_pid(s: &str) -> Result<u32, String> {
     let pid = s.parse::<u32>();
     match pid {
         Ok(p) => Ok(p),

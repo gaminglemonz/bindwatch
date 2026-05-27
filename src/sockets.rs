@@ -3,16 +3,19 @@ use indicatif::ProgressBar;
 use netstat2::*;
 use std::{net::IpAddr, time::Duration};
 
+#[derive(PartialEq)]
 pub struct LocalInfo {
     pub port: u16,
     pub addr: IpAddr,
 }
 
-#[derive(Clone)]
+#[derive(Clone, PartialEq)]
 pub struct RemoteInfo {
     pub port: u16,
     pub addr: IpAddr,
 }
+
+#[derive(PartialEq)]
 pub struct PortInfo {
     pub name: String,
     pub local: LocalInfo,
@@ -77,7 +80,10 @@ pub fn find_processes() -> Vec<PortInfo> {
         }
     }
 
-    println!("Finished! Found {} socket entries.\n", network_processes.len());
+    println!(
+        "\nFinished! Found {} socket entries.",
+        network_processes.len()
+    );
 
     return network_processes;
 }

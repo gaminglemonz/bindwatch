@@ -5,13 +5,13 @@ mod parser;
 mod sockets;
 
 fn main() {
-    let network_processes = sockets::find_processes();
-    let mut seen_pids: Vec<u32> = Vec::new();
     let args = parser::parse();
+    let mut seen_pids: Vec<u32> = Vec::new();
 
     match args.command {
         parser::Commands::List { tcp, udp, all } => {
             let spinner = ProgressBar::new_spinner();
+            let network_processes = sockets::find_processes();
 
             for (index, process) in network_processes.iter().enumerate() {
                 spinner.set_message(format!(
@@ -33,7 +33,9 @@ fn main() {
                                     p.local.addr, p.local.port, p.pid, p.name
                                 ));
                             } else {
-                                if !all { continue; }
+                                if !all {
+                                    continue;
+                                }
                             }
                         }
                         "TCP" => {
@@ -49,7 +51,9 @@ fn main() {
                                     p.name
                                 ));
                             } else {
-                                if !all { continue; }
+                                if !all {
+                                    continue;
+                                }
                             }
                         }
                         _ => println!("Process with unknown protocol found"),
@@ -69,8 +73,9 @@ fn main() {
             pid,
             port,
             local,
-            remote
+            remote,
         } => {
+            let network_processes = sockets::find_processes();
             if port != None {
                 if local {
                     let process =
@@ -82,6 +87,8 @@ fn main() {
                             string_state(_process.state.as_ref()),
                             _process.local.port
                         );
+                    } else if process == None {
+                        println!("No process was found with local port {}", port.unwrap())
                     }
                 } else if remote {
                     let process =
@@ -93,11 +100,21 @@ fn main() {
                             string_state(_process.state.as_ref()),
                             _process.local.port
                         );
+                    } else if process == None {
+                        println!(
+                            "No process was found with on a remote socket endpoint with port {}",
+                            port.unwrap()
+                        )
                     }
                 } else {
                     println!(
                         "Please provide whether the process is local or remote (use --local or --remote flags)"
                     );
+                    println!(
+                        "help: bindwatch search --port {} --local or bindwatch search --port {} --remote",
+                        port.unwrap(),
+                        port.unwrap()
+                    )
                 }
             } else if let Some(_name) = &name {
                 let process = lookup::find_process::by_name(&network_processes, _name.to_string());
@@ -108,6 +125,8 @@ fn main() {
                         string_state(_process.state.as_ref()),
                         _process.local.port
                     );
+                } else if process == None {
+                    println!("No process was found with name {}", name.as_ref().unwrap())
                 }
             } else if let Some(_pid) = pid {
                 let process = lookup::find_process::by_pid(&network_processes, pid.unwrap());
@@ -118,6 +137,8 @@ fn main() {
                         string_state(_process.state.as_ref()),
                         _process.local.port
                     );
+                } else if process == None {
+                    println!("No process was found with PID {}", pid.unwrap())
                 }
             } else if let Some(_path) = path {
                 let process = lookup::find_process::by_path(
@@ -131,6 +152,8 @@ fn main() {
                         string_state(_process.state.as_ref()),
                         _process.local.port
                     );
+                } else if process == None {
+                    println!("No process was found with path {}", path.as_ref().unwrap())
                 }
             }
         }
