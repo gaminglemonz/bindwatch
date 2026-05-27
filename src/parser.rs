@@ -9,12 +9,6 @@ use clap::{Parser, Subcommand};
 pub struct Args {
     #[command(subcommand)]
     pub command: Commands,
-
-    #[arg(short, long)]
-    pub local: bool,
-
-    #[arg(short, long)]
-    pub remote: bool,
 }
 
 #[derive(Subcommand, Debug)]
@@ -25,6 +19,9 @@ pub enum Commands {
 
         #[arg(long)]
         udp: bool,
+
+        #[arg(short, long)]
+        all: bool,
     },
     Search {
         #[arg(short, long)]
@@ -38,6 +35,12 @@ pub enum Commands {
 
         #[arg(long, value_parser=validate_pid)]
         pid: Option<u32>,
+
+        #[arg(short, long)]
+        local: bool,
+
+        #[arg(short, long)]
+        remote: bool,
     },
 }
 fn validate_port (s: &str) -> Result<u16, String> {

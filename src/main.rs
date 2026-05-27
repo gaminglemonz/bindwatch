@@ -1,5 +1,3 @@
-// use std::collections::HashMap;
-// use std::any::Any;
 use indicatif::ProgressBar;
 use netstat2::*;
 mod lookup;
@@ -12,7 +10,7 @@ fn main() {
     let args = parser::parse();
 
     match args.command {
-        parser::Commands::List { tcp, udp } => {
+        parser::Commands::List { tcp, udp, all } => {
             let spinner = ProgressBar::new_spinner();
 
             for (index, process) in network_processes.iter().enumerate() {
@@ -35,7 +33,7 @@ fn main() {
                                     p.local.addr, p.local.port, p.pid, p.name
                                 ));
                             } else {
-                                continue;
+                                if !all { continue; }
                             }
                         }
                         "TCP" => {
@@ -51,7 +49,7 @@ fn main() {
                                     p.name
                                 ));
                             } else {
-                                continue;
+                                if !all { continue; }
                             }
                         }
                         _ => println!("Process with unknown protocol found"),
@@ -70,9 +68,11 @@ fn main() {
             ref path,
             pid,
             port,
+            local,
+            remote
         } => {
             if port != None {
-                if args.local {
+                if local {
                     let process =
                         lookup::find_process::by_local_port(&network_processes, port.unwrap());
                     if let Some(_process) = process {
@@ -83,7 +83,7 @@ fn main() {
                             _process.local.port
                         );
                     }
-                } else if args.remote {
+                } else if remote {
                     let process =
                         lookup::find_process::by_remote_port(&network_processes, port.unwrap());
                     if let Some(_process) = process {
